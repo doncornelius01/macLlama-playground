@@ -203,6 +203,15 @@ struct ChatBubbleView: View {
                 .greedyFrame(axis: .horizontal, alignment: chatData.isUser ? .trailing : .leading)
                 .onChange(of: self.chatData.message) { _, newValue in
                     self.chatMessage = newValue
+                    if containsMarkdown(newValue) {
+                        self.isMarkdownEnabled = true
+                    }
+                }
+                .onAppear {
+                    self.chatMessage = chatData.message
+                    if containsMarkdown(chatData.message) {
+                        self.isMarkdownEnabled = true
+                    }
                 }
             }
             
@@ -255,5 +264,11 @@ extension ChatBubbleView {
         }
         
         return resultString
+    }
+
+    /// Determine if given text likely contains Markdown formatting
+    private func containsMarkdown(_ text: String) -> Bool {
+        let pattern = "(\\*\\*|_|`|```|#|\\[.*?\\]\\(.*?\\))"
+        return text.range(of: pattern, options: .regularExpression) != nil
     }
 }
